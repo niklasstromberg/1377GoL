@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_1377GoL"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="600" Width="800">
     <Grid>
-        
+        <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="Auto" Height="Auto">
+            <StackPanel DockPanel.Dock="Top" Orientation="Vertical" >
+                <!-- Menubuttons -->
+                <StackPanel Orientation="Horizontal" Margin="3">
+                    <Button x:Name="BtnStart" Margin="5" Click="BtnStart_Click">
+                        Start
+                    </Button>
+                    <Button x:Name="BtnClear" Margin="5" Click="BtnClear_Click" >
+                        Clear
+                    </Button>
+                </StackPanel>
+                <!-- The game area -->
+                <Grid x:Name="Area" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height ="Auto" ClipToBounds="True">
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Rectangle}">
+                            <Setter Property="Opacity" Value="{Binding Path=isAlive}" />
+                        </Style>
+                    </Grid.Resources>
+                </Grid>
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Bottom" Height="30">
+                <TextBlock x:Name="TBCounter" Text="Iteration: 0" Height="20" HorizontalAlignment ="Right" Margin="3" VerticalAlignment="Center"/>
+            </StackPanel>
+        </DockPanel>
     </Grid>
 </Window>
