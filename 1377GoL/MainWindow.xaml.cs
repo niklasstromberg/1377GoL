@@ -5,12 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-
 namespace _1377GoL
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         // Properties
@@ -25,7 +21,6 @@ namespace _1377GoL
             InitializeComponent();
             Area.InitializeGrid();
             Area.PopulateGrid(theCells);
-
         }
 
         // Finds and populates the passed cells neighbors to its list
@@ -73,13 +68,13 @@ namespace _1377GoL
                 c.aliveNeighbors = c.CountLivingNeighbors();
                 bool result = false;
 
-                if (c.isAlive && c.aliveNeighbors < 2)
+                if (c.isAlive && c.aliveNeighbors < 2)                                      // cell is lonely
                     result = false;
-                else if (c.isAlive && (c.aliveNeighbors == 2 || c.aliveNeighbors == 3))
+                else if (c.isAlive && (c.aliveNeighbors == 2 || c.aliveNeighbors == 3))     // cell is happy
                     result = true;
-                else if (c.isAlive && c.aliveNeighbors > 3)
+                else if (c.isAlive && c.aliveNeighbors > 3)                                 // cell is crowded
                     result = false;
-                else if (!c.isAlive && c.aliveNeighbors == 3)
+                else if (!c.isAlive && c.aliveNeighbors == 3)                               // cell is resurrected
                     result = true;
 
                 NewCell newCell = new NewCell();
@@ -96,7 +91,6 @@ namespace _1377GoL
                             select cell.lives;
                 cc.isAlive = query.FirstOrDefault();
             }
-
             iterationCount++;
             TBCounter.Text = "Iteration: " + iterationCount;
         }
@@ -156,6 +150,7 @@ namespace _1377GoL
             public bool lives;
         }
 
+        // Same as Iteration() except it performs one step per click of the button
         private void BtnStep_Click(object sender, RoutedEventArgs e)
         {
             List<NewCell> next = new List<NewCell>();
@@ -188,6 +183,8 @@ namespace _1377GoL
                             select cell.lives;
                 cc.isAlive = query.FirstOrDefault();
             }
+            iterationCount++;
+            TBCounter.Text = "Iteration: " + iterationCount;
         }
     }
 }

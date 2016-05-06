@@ -63,7 +63,7 @@ namespace _1377GoL
                 return Convert.ToInt16(query.Count());
         }
 
-
+        // Helpermethod for future use as a counter
         public static int CountLivingCells(this List<Cell> list)
         {
             var query = from c in list
