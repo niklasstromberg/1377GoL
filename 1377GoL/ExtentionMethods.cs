@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -20,9 +17,9 @@ namespace _1377GoL
             grid.Children.Clear();
             grid.RowDefinitions.Clear();
             grid.ColumnDefinitions.Clear();
-            for (int x = 0; x <= 4; x++)
+            for (int x = 0; x <= size; x++)
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
-            for (int y = 0; y <= 4; y++)
+            for (int y = 0; y <= size; y++)
                 grid.RowDefinitions.Add(new RowDefinition());
         }
 
@@ -40,6 +37,7 @@ namespace _1377GoL
                 r.Stroke = Brushes.Black;
                 r.DataContext = cell;
                 r.MouseLeftButtonDown += new MouseButtonEventHandler(RectangleOnClick);
+                //r.ToolTip = "x: " + cell.xCoord + " y: " + cell.yCoord;                           // uncomment this line to see a rectangles coordinates in the tooltip
             }
         }
 
@@ -50,7 +48,6 @@ namespace _1377GoL
             {
                 Cell cell = ((Rectangle)sender).DataContext as Cell;
                 cell.isAlive = !cell.isAlive;
-                //MessageBox.Show(CountLivingNeighbors(cell).ToString());
             }
         }
 
@@ -64,6 +61,15 @@ namespace _1377GoL
                 return 0;
             else
                 return Convert.ToInt16(query.Count());
+        }
+
+
+        public static int CountLivingCells(this List<Cell> list)
+        {
+            var query = from c in list
+                        where c.isAlive == true
+                        select c;
+            return query.Count();
         }
     }
 }

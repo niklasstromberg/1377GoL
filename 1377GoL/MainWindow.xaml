@@ -17,6 +17,9 @@
                     <Button x:Name="BtnClear" Margin="5" Click="BtnClear_Click" >
                         Clear
                     </Button>
+                    <Button x:Name="BtnStep" Margin="5" Click="BtnStep_Click">
+                        Step
+                    </Button>
                 </StackPanel>
                 <!-- The game area -->
                 <Grid x:Name="Area" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height ="Auto" ClipToBounds="True">

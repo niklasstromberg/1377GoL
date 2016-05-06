@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 
 namespace _1377GoL
@@ -26,6 +17,7 @@ namespace _1377GoL
         public int iterationCount = 0;
         public List<Cell> theCells = new List<Cell>();
         public static bool running = false;
+        public static int size = 49;
 
         public MainWindow()
         {
@@ -33,43 +25,18 @@ namespace _1377GoL
             InitializeComponent();
             Area.InitializeGrid();
             Area.PopulateGrid(theCells);
+
         }
 
-        public List<Cell> FindNeighbors2(Cell cell)
-        {
-            var query = from c in theCells
-                        where c.yCoord == (cell.yCoord + 1) && (c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2)) ||
-                        c.yCoord == cell.yCoord && (c.xCoord == (cell.xCoord - 1) || c.xCoord == (cell.xCoord + 1)) ||
-                        c.yCoord == (cell.yCoord - 1) && (c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2))
-                        select c;
-            List<Cell> neighbors = query.ToList<Cell>();
-            return neighbors;
-        }
-
-
-        // Finds the neighbors of the cell that is passed into the method
+        // Finds and populates the passed cells neighbors to its list
         public List<Cell> FindNeighbors(Cell cell)
         {
-            List<Cell> neighbors = new List<Cell>();
-
-            foreach (Cell c in theCells)
-            {
-                if (c.yCoord == (cell.yCoord + 1) && (c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2)))
-                {
-                    if (!neighbors.Contains(c))
-                        neighbors.Add(c);
-                }
-                if (c.yCoord == cell.yCoord && (c.xCoord == (cell.xCoord - 1) || c.xCoord == (cell.xCoord + 1)))
-                {
-                    if (!neighbors.Contains(c))
-                        neighbors.Add(c);
-                }
-                if (c.yCoord == (cell.yCoord - 1) && (c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2)))
-                {
-                    if (!neighbors.Contains(c))
-                        neighbors.Add(c);
-                }
-            }
+            var query = from c in theCells
+                        where c.yCoord == (cell.yCoord + 1) && ((c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2))) ||  // bottom row
+                        c.yCoord == cell.yCoord && ((c.xCoord == (cell.xCoord - 1) || c.xCoord == (cell.xCoord + 1))) ||            // same row
+                        c.yCoord == (cell.yCoord - 1) && ((c.xCoord > (cell.xCoord - 2) && c.xCoord < (cell.xCoord + 2)))           // top row
+                        select c;
+            List<Cell> neighbors = query.ToList<Cell>();
             return neighbors;
         }
 
@@ -84,7 +51,7 @@ namespace _1377GoL
                     {
                         Dispatcher.BeginInvoke(new Action(() =>
                         {
-                            IterationLogic(theCells);
+                            IterationLogic();
                         }));
                         Thread.Sleep(100);
                     }
@@ -96,39 +63,51 @@ namespace _1377GoL
             }
         }
 
-        // The logic performed per iteration
-        public void IterationLogic(List<Cell> nextGen)
+        // The logic performed per iteration, using a temporary list to work with
+        public void IterationLogic()
         {
-            foreach (Cell c in nextGen)
+            List<NewCell> nextGen = new List<NewCell>();
+
+            foreach (Cell c in theCells)
             {
                 c.aliveNeighbors = c.CountLivingNeighbors();
+                bool result = false;
 
-                if (!c.isAlive)
-                {
-                    if (c.aliveNeighbors == 3)
-                        c.isAlive = !c.isAlive;
-                }
-                else
-                {
-                    if (c.aliveNeighbors < 2 || c.aliveNeighbors > 3)
-                        c.isAlive = !c.isAlive;
-                    //else if (c.aliveNeighbors > 3)                                       // TA BORT!!!!
-                    //    c.isAlive = false;
-                }
+                if (c.isAlive && c.aliveNeighbors < 2)
+                    result = false;
+                else if (c.isAlive && (c.aliveNeighbors == 2 || c.aliveNeighbors == 3))
+                    result = true;
+                else if (c.isAlive && c.aliveNeighbors > 3)
+                    result = false;
+                else if (!c.isAlive && c.aliveNeighbors == 3)
+                    result = true;
+
+                NewCell newCell = new NewCell();
+                newCell.x = c.xCoord;
+                newCell.y = c.yCoord;
+                newCell.lives = result;
+                nextGen.Add(newCell);
             }
+
+            foreach (Cell cc in theCells)
+            {
+                var query = from cell in nextGen
+                            where cell.x == cc.xCoord && cell.y == cc.yCoord
+                            select cell.lives;
+                cc.isAlive = query.FirstOrDefault();
+            }
+
             iterationCount++;
             TBCounter.Text = "Iteration: " + iterationCount;
-
-            theCells = nextGen;
         }
 
         // Creates the cells and sets the properties
         public void CreateTheCells()
         {
             theCells.Clear();
-            for (int x = 0; x <= 4; x++)
+            for (int y = 0; y <= size; y++)
             {
-                for (int y = 0; y <= 4; y++)
+                for (int x = 0; x <= size; x++)
                 {
                     Cell cell = new Cell(x, y) { xCoord = x, yCoord = y, isAlive = false };
                     theCells.Add(cell);
@@ -136,7 +115,7 @@ namespace _1377GoL
             }
             foreach (Cell cell in theCells)
             {
-                cell.neighbors = FindNeighbors2(cell);
+                cell.neighbors = FindNeighbors(cell);
             }
         }
 
@@ -151,16 +130,6 @@ namespace _1377GoL
             Area.InitializeGrid();
             Area.PopulateGrid(theCells);
         }
-
-        //// Changes the value of the corresponding cells isAlive property
-        //public void RectangleOnClick(object sender, MouseButtonEventArgs e)                 // TA BORT!!!!
-        //{
-        //    if (!running)
-        //    {
-        //        Cell cell = ((Rectangle)sender).DataContext as Cell;                        // TA BORT!!!!
-        //        cell.isAlive = !cell.isAlive;
-        //    }
-        //}
 
         // Starts and pauses the iterations
         private void BtnStart_Click(object sender, RoutedEventArgs e)
@@ -178,5 +147,48 @@ namespace _1377GoL
                 Iteration(running);
             }
         }
+
+        // holds next generation values until iteration is finished
+        struct NewCell
+        {
+            public int x;
+            public int y;
+            public bool lives;
+        }
+
+        private void BtnStep_Click(object sender, RoutedEventArgs e)
+        {
+            List<NewCell> next = new List<NewCell>();
+
+            foreach (Cell c in theCells)
+            {
+                c.aliveNeighbors = c.CountLivingNeighbors();
+                bool result = false;
+
+                if (c.isAlive && c.aliveNeighbors < 2)
+                    result = false;
+                else if (c.isAlive && (c.aliveNeighbors == 2 || c.aliveNeighbors == 3))
+                    result = true;
+                else if (c.isAlive && c.aliveNeighbors > 3)
+                    result = false;
+                else if (!c.isAlive && c.aliveNeighbors == 3)
+                    result = true;
+
+                NewCell newCell = new NewCell();
+                newCell.x = c.xCoord;
+                newCell.y = c.yCoord;
+                newCell.lives = result;
+                next.Add(newCell);
+            }
+
+            foreach (Cell cc in theCells)
+            {
+                var query = from cell in next
+                            where cell.x == cc.xCoord && cell.y == cc.yCoord
+                            select cell.lives;
+                cc.isAlive = query.FirstOrDefault();
+            }
+        }
     }
 }
+
