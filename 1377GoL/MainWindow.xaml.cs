@@ -81,15 +81,15 @@ namespace _1377GoL
                 newCell.x = c.xCoord;
                 newCell.y = c.yCoord;
                 newCell.lives = result;
-                nextGen.Add(newCell);
+                nextGen.Add(newCell);                                                       // store data about the next generation
             }
 
-            foreach (Cell cc in theCells)
-            {
+            foreach (Cell c in theCells)                                                   // Move data from next generation to current generation
+            {                                                                               // (the binding does the rest)
                 var query = from cell in nextGen
-                            where cell.x == cc.xCoord && cell.y == cc.yCoord
+                            where cell.x == c.xCoord && cell.y == c.yCoord
                             select cell.lives;
-                cc.isAlive = query.FirstOrDefault();
+                c.isAlive = query.FirstOrDefault();
             }
             iterationCount++;
             TBCounter.Text = "Iteration: " + iterationCount;
@@ -150,41 +150,10 @@ namespace _1377GoL
             public bool lives;
         }
 
-        // Same as Iteration() except it performs one step per click of the button
+        // Runs IterationLogic() and performs one iteration per click of the button
         private void BtnStep_Click(object sender, RoutedEventArgs e)
         {
-            List<NewCell> next = new List<NewCell>();
-
-            foreach (Cell c in theCells)
-            {
-                c.aliveNeighbors = c.CountLivingNeighbors();
-                bool result = false;
-
-                if (c.isAlive && c.aliveNeighbors < 2)
-                    result = false;
-                else if (c.isAlive && (c.aliveNeighbors == 2 || c.aliveNeighbors == 3))
-                    result = true;
-                else if (c.isAlive && c.aliveNeighbors > 3)
-                    result = false;
-                else if (!c.isAlive && c.aliveNeighbors == 3)
-                    result = true;
-
-                NewCell newCell = new NewCell();
-                newCell.x = c.xCoord;
-                newCell.y = c.yCoord;
-                newCell.lives = result;
-                next.Add(newCell);
-            }
-
-            foreach (Cell cc in theCells)
-            {
-                var query = from cell in next
-                            where cell.x == cc.xCoord && cell.y == cc.yCoord
-                            select cell.lives;
-                cc.isAlive = query.FirstOrDefault();
-            }
-            iterationCount++;
-            TBCounter.Text = "Iteration: " + iterationCount;
+            IterationLogic();
         }
     }
 }
