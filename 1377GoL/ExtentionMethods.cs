@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -33,9 +34,8 @@ namespace _1377GoL
                 Grid.SetRow(r, cell.yCoord);
                 grid.Children.Add(r);
                 r.Stretch = Stretch.UniformToFill;
-                r.Fill = Brushes.Black;
-                r.Stroke = Brushes.Black;
                 r.DataContext = cell;
+                r.Stroke = Brushes.Black;
                 r.MouseLeftButtonDown += new MouseButtonEventHandler(RectangleOnClick);
                 //r.ToolTip = "x: " + cell.xCoord + " y: " + cell.yCoord;                           // uncomment this line to see a rectangles coordinates in the tooltip
             }
@@ -51,7 +51,7 @@ namespace _1377GoL
             }
         }
 
-        // Counting alive neighbors using the virtual list in the object
+        // Counting alive neighbors using the virtual list in the object being passed in
         public static short CountLivingNeighbors(this Cell cell)
         {
             var query = from c in cell.neighbors
@@ -63,7 +63,7 @@ namespace _1377GoL
                 return Convert.ToInt16(query.Count());
         }
 
-        // Helpermethod for future use as a counter
+        // Counts the current number of living cells and returns the value
         public static int CountLivingCells(this List<Cell> list)
         {
             var query = from c in list

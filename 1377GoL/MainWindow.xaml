@@ -26,12 +26,19 @@
                     <Grid.Resources>
                         <Style TargetType="{x:Type Rectangle}">
                             <Setter Property="Opacity" Value="{Binding Path=isAlive}" />
+                            <Setter Property="Fill" Value="{Binding Path=background }"/>
                         </Style>
                     </Grid.Resources>
                 </Grid>
             </StackPanel>
-            <StackPanel DockPanel.Dock="Bottom" Height="30">
-                <TextBlock x:Name="TBCounter" Text="Iteration: 0" Height="20" HorizontalAlignment ="Right" Margin="3" VerticalAlignment="Center"/>
+            <!--Counters-->
+            <StackPanel DockPanel.Dock="Bottom" Height="30" Orientation="Horizontal">
+                <TextBlock x:Name="TBIterations" Text="Iteration: 0" Height="20" Margin="3" />
+                <TextBlock x:Name="TBBirths" Margin="3" Text="Births: 0" Height="20" />
+                <TextBlock x:Name="TBDeaths" Margin="3" Text="Deaths: 0" Height="20" />
+                <TextBlock x:Name="TBMaxAlive" Margin="3" Text="Max alive: 0" Height="20" />
+                <TextBlock x:Name="TBAlive" Margin="3" Text="Alive: 0" Height="20"/>
+
             </StackPanel>
         </DockPanel>
     </Grid>

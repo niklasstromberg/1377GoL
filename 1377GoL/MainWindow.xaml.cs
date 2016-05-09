@@ -4,16 +4,34 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace _1377GoL
 {
     public partial class MainWindow : Window
     {
         // Properties
+        public int maxCellsAlive = 0;
+        public int currCellsAlive = 0;
+        public int births = 0;
+        public int deaths = 0;
         public int iterationCount = 0;
         public List<Cell> theCells = new List<Cell>();
         public static bool running = false;
         public static int size = 49;
+
+        
+
+        public enum backgrounds : int
+        {
+            Black,
+            Purple,
+            Orange,
+            Yellow,
+            Red,
+        }
+
 
         public MainWindow()
         {
@@ -84,15 +102,43 @@ namespace _1377GoL
                 nextGen.Add(newCell);                                                       // store data about the next generation
             }
 
-            foreach (Cell c in theCells)                                                   // Move data from next generation to current generation
+            foreach (Cell c in theCells)                                                    // Move data from next generation to current generation
             {                                                                               // (the binding does the rest)
+                bool prevValue = c.isAlive;
                 var query = from cell in nextGen
                             where cell.x == c.xCoord && cell.y == c.yCoord
                             select cell.lives;
-                c.isAlive = query.FirstOrDefault();
+                bool newValue = query.FirstOrDefault();
+                c.isAlive = newValue;
+
+                if (c.isAlive == false)
+                    c.age = 0;
+                if (newValue == prevValue && prevValue == true)
+                    c.age++;
+                if (newValue == true && prevValue == false)
+                    births++;
+                if (newValue == false && prevValue == true)
+                    deaths++;
+
+                if (c.age == 2)
+                    c.background = Brushes.Purple;
+                if (c.age == 4)
+                    c.background = Brushes.Orange;
+                if (c.age == 6)
+                    c.background = Brushes.Yellow;
+                if (c.age > 8)
+                    c.background = Brushes.Red;
             }
+            // Update counters
+            currCellsAlive = theCells.CountLivingCells();
+            if (currCellsAlive > maxCellsAlive)
+                maxCellsAlive = currCellsAlive;
             iterationCount++;
-            TBCounter.Text = "Iteration: " + iterationCount;
+            TBIterations.Text = "Iteration: " + iterationCount;
+            TBDeaths.Text = "Deaths: " + deaths;
+            TBBirths.Text = "Births: " + births;
+            TBAlive.Text = "Alive: " + currCellsAlive;
+            TBMaxAlive.Text = "Max alive: " + maxCellsAlive;
         }
 
         // Creates the cells and sets the properties
@@ -103,7 +149,7 @@ namespace _1377GoL
             {
                 for (int x = 0; x <= size; x++)
                 {
-                    Cell cell = new Cell(x, y) { xCoord = x, yCoord = y, isAlive = false };
+                    Cell cell = new Cell(x, y) { xCoord = x, yCoord = y, isAlive = false, age = 0 };
                     theCells.Add(cell);
                 }
             }
@@ -118,8 +164,16 @@ namespace _1377GoL
         {
             running = false;
             BtnStart.Content = "Start";
+            maxCellsAlive = 0;
+            currCellsAlive = 0;
+            births = 0;
+            deaths = 0;
             iterationCount = 0;
-            TBCounter.Text = "Iteration: " + iterationCount;
+            TBIterations.Text = "Iteration: 0";
+            TBDeaths.Text = "Deaths: 0";
+            TBBirths.Text = "Births: 0";
+            TBAlive.Text = "Alive: 0";
+            TBMaxAlive.Text = "Max alive: 0";
             CreateTheCells();
             Area.InitializeGrid();
             Area.PopulateGrid(theCells);
