@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace _1377GoL
 {
@@ -20,18 +19,6 @@ namespace _1377GoL
         public List<Cell> theCells = new List<Cell>();
         public static bool running = false;
         public static int size = 49;
-
-        
-
-        public enum backgrounds : int
-        {
-            Black,
-            Purple,
-            Orange,
-            Yellow,
-            Red,
-        }
-
 
         public MainWindow()
         {
@@ -111,15 +98,17 @@ namespace _1377GoL
                 bool newValue = query.FirstOrDefault();
                 c.isAlive = newValue;
 
-                if (c.isAlive == false)
+                if (c.isAlive == false)                                                     // Update properties and variables
                     c.age = 0;
-                if (newValue == prevValue && prevValue == true)
+                if (newValue == prevValue && newValue == true)
                     c.age++;
                 if (newValue == true && prevValue == false)
                     births++;
                 if (newValue == false && prevValue == true)
                     deaths++;
 
+                if (c.age < 2)
+                    c.background = Brushes.Black;
                 if (c.age == 2)
                     c.background = Brushes.Purple;
                 if (c.age == 4)
